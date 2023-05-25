@@ -5,7 +5,42 @@ require('dotenv').config();
 
 const { JWT_SECRET, JWT_EXPIRY } = process.env
 
-
+const createAuthor = async function (req,res){
+    try{
+       let data = req.body;
+       const saltRounds = 10; // Number of salt rounds
+       const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+       data.password = hashedPassword;
+       let authorData = await authorModel.create(data);
+       res.status(200).send({ status: true, Data: authorData });
+   }
+   catch(error){
+       console.log(error)
+       res.status(500).send({ error: "Internal Server Error" });
+   }
+   };
+   
+   const getAuthor = async function (req,res){
+       try{
+           const { email } = req.body;
+           const authorData = await authorModel.findOne({ email }).select({ password: 0 });
+       
+           if (!authorData) {
+             return res.status(404).send({ status:false, message: 'Author not found' });
+           }
+           
+           else if (authorData.isDeleted == true) {
+           return res.status(403).send({ status: false, msg: "User is deleted" });
+           }
+       
+           res.status(200).send({ status:true, result:authorData });
+       }
+       catch(error){
+           console.log(error)
+           res.status(500).send({ error: 'Internal Server Error' });
+       }
+};
+   
 
 const login = async(req,res)=>{
     try {
@@ -40,3 +75,5 @@ const login = async(req,res)=>{
 
 
 module.exports.login = login
+module.exports.createAuthor = createAuthor;
+module.exports.getAuthor = getAuthor;
