@@ -1,8 +1,14 @@
 const express = require('express')
 const router = express.Router()
+const { login } = require('../controllers/authorController.js')
 
 
 
+
+
+
+// login author
+router.post('/login', login)
 
 
 
