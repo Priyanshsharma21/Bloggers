@@ -1,7 +1,5 @@
 const BlogModel = require('../models/blogModel');
 
-
-
 //  Deleting blog by ID
 const deleteBlogById = async function (req, res) {
 
