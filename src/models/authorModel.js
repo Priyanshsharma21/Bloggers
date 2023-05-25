@@ -32,7 +32,7 @@ const authorSchema = new Schema({
         required : [true, 'Please enter your password'],
         minLength : [7,'Password length should be greater than 7 characters'],
     }
-})
+},{timestamps : true})
 
 
 module.exports = model('Author', authorSchema)
