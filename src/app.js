@@ -2,8 +2,7 @@ const express  = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
-const authorRoutes = require('./routes/author.js')
-const blogRoutes = require('./routes/blog.js')
+const routes = require('./routes/route.js')
 
 
 
@@ -17,8 +16,7 @@ app.use(morgan("tiny"))
 app.use(cors())
 
 //route middleware
-app.use('/api/v1',authorRoutes)
-app.use('/api/v1',blogRoutes)
+app.use('/',routes)
 
 
 
