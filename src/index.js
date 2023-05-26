@@ -9,7 +9,7 @@ const { PORT, MONGODB_URL } = process.env
 const startServer = async()=>{
     try {
         mongoose.set('strictQuery', true)
-        await mongoose.connect(process.env.MONGODB_URL,{
+        await mongoose.connect(MONGODB_URL,{
             useNewUrlParser : true,
             useUnifiedTopology : true
         })

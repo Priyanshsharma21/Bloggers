@@ -7,6 +7,38 @@ const { JWT_SECRET, JWT_EXPIRY } = process.env
 
 
 
+const createAuthor = async function (req,res){
+    try{
+       let data = req.body;
+       const saltRounds = 10; // Number of salt rounds
+       const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+       data.password = hashedPassword;
+       let authorData = await authorModel.create(data);
+       res.status(201).send({ status: true, data: authorData });
+   }
+   catch(error){
+       console.log(error)
+       res.status(500).send({ error: "Internal Server Error" });
+   }
+};
+
+
+
+
+const getAuthor = async function (req,res){
+       try{
+            const authors = await authorModel.find()
+           res.status(200).send({ status:true, authors:authors });
+       }
+       catch(error){
+           console.log(error)
+           res.status(500).send({ error: 'Internal Server Error' });
+       }
+};
+   
+
+
+
 const login = async(req,res)=>{
     try {
         const { email, password } = req.body
@@ -16,7 +48,7 @@ const login = async(req,res)=>{
 
         const author = await authorModel.findOne({email}).select('+password')
 
-        if(!author) return next(new CustomError('You are not registered', 400))
+        if(!author) return res.status(500).json({success : false, message : 'You are not registered'})
 
 
         const isValidAuthor = bcrypt.compare(password, author.password)
@@ -40,3 +72,5 @@ const login = async(req,res)=>{
 
 
 module.exports.login = login
+module.exports.createAuthor = createAuthor;
+module.exports.getAuthor = getAuthor;
