@@ -13,6 +13,7 @@ const createAuthor = async function (req,res){
        const saltRounds = 10; // Number of salt rounds
        const hashedPassword = await bcrypt.hash(data.password, saltRounds);
        data.password = hashedPassword;
+       console.log(data)
        let authorData = await authorModel.create(data);
        res.status(201).send({ status: true, data: authorData });
    }
