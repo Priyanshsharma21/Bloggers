@@ -29,16 +29,18 @@ const isLoggedIn = async (req, res, next) => {
         }
 
         const {blogId} = req.params; 
-        const blog = await blogModel.findOne({
-            _id: blogId
-        });
-
-        if (!blog || blog.authorId.toString() !== author._id.toString()) {
-            return res.status(401).json({
-                message: 'Unauthorized access'
+        if(blogId){
+            const blog = await blogModel.findOne({
+                _id: blogId
             });
+    
+            if (!blog || blog.authorId.toString() !== author._id.toString()) {
+                return res.status(401).json({
+                    message: 'Unauthorized access'
+                });
+            }
+    
         }
-
 
         req.author = author
 
