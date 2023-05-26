@@ -17,7 +17,7 @@ const isLoggedIn = async(req,res,next)=>{
 
         const author = await authorModel.findById(decoded._id)
 
-        req.user = author
+        req.author = author
 
         next()
 
