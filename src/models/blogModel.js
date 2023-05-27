@@ -9,12 +9,10 @@ const blogSchema = new Schema({
         type: String,
         required: true
     },
-
     body : {
         type: String,
         required: true
     },
-
     authorId : {
         type : Schema.Types.ObjectId,
         ref : 'Author',

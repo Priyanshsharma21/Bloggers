@@ -14,6 +14,7 @@ const startServer = async()=>{
             useUnifiedTopology : true
         })
         console.log("Database Connected")
+        
         app.listen(PORT,()=>{
             console.log(`Server Started At Port ${PORT}`)
         })
