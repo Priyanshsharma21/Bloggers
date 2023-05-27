@@ -5,6 +5,8 @@ require('dotenv').config();
 
 const { JWT_SECRET, JWT_EXPIRY } = process.env
 
+
+
 const createAuthor = async function (req,res){
     try{
        let data = req.body;
@@ -12,28 +14,21 @@ const createAuthor = async function (req,res){
        const hashedPassword = await bcrypt.hash(data.password, saltRounds);
        data.password = hashedPassword;
        let authorData = await authorModel.create(data);
-       res.status(200).send({ status: true, Data: authorData });
+       res.status(201).send({ status: true, data: authorData });
    }
    catch(error){
        console.log(error)
        res.status(500).send({ error: "Internal Server Error" });
    }
-   };
-   
-   const getAuthor = async function (req,res){
+};
+
+
+
+
+const getAuthor = async function (req,res){
        try{
-           const { email } = req.body;
-           const authorData = await authorModel.findOne({ email }).select({ password: 0 });
-       
-           if (!authorData) {
-             return res.status(404).send({ status:false, message: 'Author not found' });
-           }
-           
-           else if (authorData.isDeleted == true) {
-           return res.status(403).send({ status: false, msg: "User is deleted" });
-           }
-       
-           res.status(200).send({ status:true, result:authorData });
+            const authors = await authorModel.find()
+           res.status(200).send({ status:true, authors:authors });
        }
        catch(error){
            console.log(error)
@@ -41,6 +36,8 @@ const createAuthor = async function (req,res){
        }
 };
    
+
+
 
 const login = async(req,res)=>{
     try {
@@ -51,7 +48,7 @@ const login = async(req,res)=>{
 
         const author = await authorModel.findOne({email}).select('+password')
 
-        if(!author) return next(new CustomError('You are not registered', 400))
+        if(!author) return res.status(500).json({success : false, message : 'You are not registered'})
 
 
         const isValidAuthor = bcrypt.compare(password, author.password)
@@ -68,7 +65,7 @@ const login = async(req,res)=>{
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({message : "Error Occured"})
+        res.status(500).json({message : "Error Occure"})
     }
 }
 
