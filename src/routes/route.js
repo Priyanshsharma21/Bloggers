@@ -1,17 +1,18 @@
 const express = require('express')
 const router = express.Router()
 const { login,createAuthor,getAuthor } = require('../controllers/authorController.js')
-const { deleteBlogById,deleteByQuerying,createBlog,getBlog } = require('../controllers/blogController.js')
+const { deleteBlogById,deleteByQuerying,createBlog,getBlog,getAllBlogs,updateBlog } = require('../controllers/blogController.js')
+const { isLoggedIn } = require('../middlewares/index.js')
 
 
 
 //blog routes
-router.post('/createBlog' , createBlog)
+router.post('/createBlog',isLoggedIn, createBlog)
 router.get('/getBlog' , getBlog);
+router.get('/blogs' , getAllBlogs);
+router.put('/blogs/:blogId' ,isLoggedIn, updateBlog);
 
 
-// router.post('/createBlog' , blogModel.createBlog)
-// router.get('/getBlog' , blogModel.getBlog);
 
 
 // login author
@@ -21,9 +22,10 @@ router.post('/login', login)
 router.get("/authors", getAuthor)
 router.post("/authors", createAuthor)
 
-router.delete('/blogs?queryParams',deleteByQuerying)
-router.delete('/blogs/:blogId',deleteBlogById)
+
+router.delete('/blogs?queryParams',isLoggedIn,deleteByQuerying)
+router.delete('/blogs/:blogId',isLoggedIn,deleteBlogById)
 
 
 
-module.exports = router;
+module.exports = router
