@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { login,createAuthor,getAuthor } = require('../controllers/authorController.js')
 const { deleteBlogById,deleteByQuerying,createBlog,getBlog,getAllBlogs,updateBlog } = require('../controllers/blogController.js')
-const { isLoggedIn , authorization} = require('../middlewares/authMiddleware.js')
+const { isLoggedIn , authorization } = require('../middlewares/authMiddleware.js')
 
 
 
@@ -24,7 +24,7 @@ router.put('/blogs/:blogId',isLoggedIn,authorization, updateBlog);
 
 router.delete('/blogs/:blogId',isLoggedIn,authorization,deleteBlogById)
 
-router.delete('/blogs',isLoggedIn,authorization,deleteByQuerying)
+router.delete('/blogs',isLoggedIn,deleteByQuerying)
 
 
 

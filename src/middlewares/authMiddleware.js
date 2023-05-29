@@ -8,17 +8,43 @@ const {
 } = process.env
 
 
+// const isLoggedIn = async (req, res, next) => {
+//     try {
+//         const token = req.headers['X-Api-Key'] || req.headers['x-api-key']
+//         // console.log(token)
+//         if (!token) return res.status(404).json({
+//             Message: "Token Not Found"
+//         })
+
+//          jwt.verify(token, JWT_SECRET , (err , decoded) => {
+//             if(err) {
+//                 return res.status(400).send({status : false , msg : "given token is invalid"})
+//             }
+//             // console.log(decoded)
+//             if(!decoded) return res.status(401).send({ status: false, msg: "Invalid Token Authentication failed" })
+//             next()
+//          } )
+//     } catch (error) {
+//         return res.status(500).json({
+//             success: false,
+//             message: "Internal Server Error",
+//             err : error.message
+            
+//         })
+//     }
+// }
+
 const isLoggedIn = async (req, res, next) => {
     try {
-        const token = req.headers['X-Api-Key'] || req.headers['x-api-key']
-        console.log(token)
+        const token = req.headers['X-Api-Key'] || req.headers['x-api-key'] //||  req.headers.authorization.split(" ")[1]
+
+
         if (!token) return res.status(404).json({
             Message: "Token Not Found"
         })
 
         const decoded = jwt.verify(token, JWT_SECRET)
-        console.log(decoded)
-        console.log(decoded.id)
+    
         if(decoded == null) return res.status(401).send({ status: false, msg: "Invalid Token Authentication failed" })
 
         const author = await authorModel.findById(decoded.id)
@@ -28,6 +54,7 @@ const isLoggedIn = async (req, res, next) => {
                 message: 'Unauthorized access'
             });
         }
+        req.iD=author._id
 
         next()
 
@@ -40,7 +67,6 @@ const isLoggedIn = async (req, res, next) => {
         })
     }
 }
-
 
 
 const authorization = async function (req, res, next) {
@@ -68,55 +94,6 @@ const authorization = async function (req, res, next) {
     }
 }
 
-// const isLoggedIn = async (req, res, next) => {
-//     try {
-//         // const token = req.headers.authorization.split(" ")[1] || req.headers['x-api-key']
-//         const token = req.headers['X-Api-Key'] || req.headers['x-api-key']
-//         console.log(token)
-//         if (!token) return res.status(404).json({
-//             Message: "Token Not Found"
-//         })
-
-//         const decoded = jwt.verify(token, JWT_SECRET)
-//         if(!decoded) return res.status(401).send({ status: false, msg: "Invalid Token Authentication failed" })
-//         console.log(decoded._id)
-
-//         const author = await authorModel.findById(decoded._id)
-
-//         if (!author) {
-//             return res.status(401).json({
-//                 message: 'Unauthorized access'
-//             });
-//         }
-
-//         const {blogId} = req.params; 
-//         if(blogId){
-//             const blog = await blogModel.findOne({
-//                 _id: blogId
-//             });
-    
-//             if (!blog || blog.authorId.toString() !== author._id.toString()) {
-//                 return res.status(401).json({
-//                     message: 'Unauthorized access'
-//                 });
-//             }
-    
-//         }
-
-//         req.author = author
-
-//         next()
-
-//     } catch (error) {
-//         // console.log(error)
-//         res.status(500).json({
-//             success: false,
-//             message: "Internal Server Error",
-//             err : error
-            
-//         })
-//     }
-// }
 
 
 

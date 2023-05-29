@@ -16,11 +16,21 @@ function validString(input){
     return (/^[a-zA-Z]+$/.test(input))
 }
 
+// const validateEmail = (email) => {
+//     return email.match(/^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,15}$/);
+// };
+
 const validateEmail = (email) => {
-    return email.match(/^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,15}$/);
+    return email.match(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/);
 };
 
-// const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+ const isValidPassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/;
+      console.log(passwordRegex.test(password))
+    return passwordRegex.test(password);
+  };
+
+
 
 const createAuthor = async function (req, res) {
     try {
@@ -49,7 +59,11 @@ const createAuthor = async function (req, res) {
         if (!isValid(lname)) { return res.status(400).send({ status: false, msg: "author last name is not valid " }) }
         if (!validString(lname)) { return res.status(400).send({ status: false, msg: "author last name is not valid string" }) }
 
-        if (!isValid(password)) { return res.status(400).send({ status: false, msg: "password name is not valid" }) }
+        if(password.length < 8) return res.status(400).send({status : false , msg : "Password length should be greater than 8 characters"})
+        // if (!isValid(password)) { return res.status(400).send({ status: false, msg: "password name is not valid" }) }
+        if (!isValidPassword(password)) { return res.status(400).send({ status: false, msg: "invalid password " }) }
+
+        if (!isValid(email)) { return res.status(400).send({ status: false, msg: " Invalid email" }) }
 
         if (!validateEmail(email)) { return res.status(400).send({ status: false, msg: "Enter the valid email" }) }
 
@@ -57,12 +71,13 @@ const createAuthor = async function (req, res) {
         const uniqueMail = await authorModel.findOne({ email: email });
         if (uniqueMail) return res.status(400).send({ status: false, msg: "this email already exist" });
 
+        // Hashing the password using bcrypt
         const saltRounds = 10; // Number of salt rounds
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         author.password = hashedPassword;
 
         let authorCreated = await authorModel.create(author)
-        res.status(201).send({ status: true, data: authorCreated })
+        return res.status(201).send({ status: true, data: authorCreated })
     }
     catch (err) { return res.status(500).send({ status: false, msg: err.message }) }
 
@@ -89,9 +104,8 @@ const login = async(req,res)=>{
     try {
         const { email, password } = req.body
 
-        if(!email || !password ) return res.status(400).json({message : "Please enter email and password"})
+        if(!email || !password ) return res.status(400).json({message : "please provide valid credential "})
 
-        console.log(email)
         const author = await authorModel.findOne({email : email})//.select('+password')
         if(!author) return res.status(400).json({success : false, message : 'You are not registered'})
         console.log(author.password)
