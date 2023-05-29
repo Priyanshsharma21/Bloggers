@@ -236,6 +236,8 @@ const deleteByQuerying = async function (req, res) {
             msg: "Enter the details of blog that you would like to delete"
         })
 
+         authorId = mongoose.Types.ObjectId.isValid(authorId)
+        if (!authorId) return res.status(400).send({ status: false, msg: "authorId is not a valid ObjectId" });
         //finding document using query params
         const ToBeDeleted = await blogModel.findOneAndUpdate({
             isDeleted: false,
