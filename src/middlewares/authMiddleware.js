@@ -8,31 +8,6 @@ const {
 } = process.env
 
 
-// const isLoggedIn = async (req, res, next) => {
-//     try {
-//         const token = req.headers['X-Api-Key'] || req.headers['x-api-key']
-//         // console.log(token)
-//         if (!token) return res.status(404).json({
-//             Message: "Token Not Found"
-//         })
-
-//          jwt.verify(token, JWT_SECRET , (err , decoded) => {
-//             if(err) {
-//                 return res.status(400).send({status : false , msg : "given token is invalid"})
-//             }
-//             // console.log(decoded)
-//             if(!decoded) return res.status(401).send({ status: false, msg: "Invalid Token Authentication failed" })
-//             next()
-//          } )
-//     } catch (error) {
-//         return res.status(500).json({
-//             success: false,
-//             message: "Internal Server Error",
-//             err : error.message
-            
-//         })
-//     }
-// }
 
 const isLoggedIn = async (req, res, next) => {
     try {
@@ -99,3 +74,32 @@ const authorization = async function (req, res, next) {
 
 module.exports.isLoggedIn = isLoggedIn
 module.exports.authorization = authorization;
+
+
+
+
+// const isLoggedIn = async (req, res, next) => {
+//     try {
+//         const token = req.headers['X-Api-Key'] || req.headers['x-api-key']
+//         // console.log(token)
+//         if (!token) return res.status(404).json({
+//             Message: "Token Not Found"
+//         })
+
+//          jwt.verify(token, JWT_SECRET , (err , decoded) => {
+//             if(err) {
+//                 return res.status(400).send({status : false , msg : "given token is invalid"})
+//             }
+//             // console.log(decoded)
+//             if(!decoded) return res.status(401).send({ status: false, msg: "Invalid Token Authentication failed" })
+//             next()
+//          } )
+//     } catch (error) {
+//         return res.status(500).json({
+//             success: false,
+//             message: "Internal Server Error",
+//             err : error.message
+            
+//         })
+//     }
+// }

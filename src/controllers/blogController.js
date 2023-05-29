@@ -277,69 +277,6 @@ const deleteByQuerying = async function (req, res) {
         })
     }
 }
-//  delete blog by querying
-// const deleteByQuerying = async function (req, res) {
-//     try {
-//         let data = req.query
-
-//         let {
-//             category,
-//             authorId,
-//             tags,
-//             subcategory,
-//             isPublished
-//         } = req.query
-        
-//         //check if the query field is empty
-//         if (Object.keys(data).length == 0) return res.status(400).send({
-//             status: false,
-//             msg: "Enter the details of blog that you would like to delete"
-//         })
-
-//        if(authorId){
-//         authorId = mongoose.Types.ObjectId.isValid(authorId)
-//         if (!authorId) return res.status(400).send({ status: false, msg: "authorId is not a valid ObjectId" });
-//        }
-//         //finding document using query params
-//         const ToBeDeleted = await blogModel.findOneAndUpdate({
-//             isDeleted: false,
-//             $or: [{
-//                 category: category
-//             }, {
-//                 authorId: authorId
-//             }, {
-//                 tags: tags
-//             }, {
-//                 subcategory: subcategory
-//             }, {
-//                 isPublished: isPublished
-//             }]
-//         }, {
-//             $set: {
-//                 isDeleted: true,
-//                 deletedAt: new Date()
-//             }
-//         },
-//         {new  : true})
-
-//         if (ToBeDeleted == null) return res.status(404).send({
-//             status: false,
-//             msg: "Blog not found or it was already deleted"
-//         })
-
-//         res.status(200).send({
-//             status: true,
-//             msg: "deletion successfull",
-//             // data : ToBeDeleted
-//         })
-//     } catch (err) {
-//         return res.status(500).send({
-//             status: false,
-//             msg: err.message
-//         })
-//     }
-// }
-
 
 module.exports.deleteBlogById = deleteBlogById;
 module.exports.deleteByQuerying = deleteByQuerying;
