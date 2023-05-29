@@ -1,8 +1,57 @@
 const blogModel = require('../models/blogModel.js');
 const authorModel = require('../models/authorModel.js')
+const { isValid,
+    validString,
+    validateEmail } = require('../utils/index.js')
+
+const mongoose = require('mongoose');
 
 
-
+const createBlog = async function (req, res) {
+    try {
+        let blogData = req.body;
+        if (!Object.keys(blogData).length) return res.send({ status: false, message: "pls provide blog details" })
+        // Destructuring the blogData
+        const { title, body, authorId, category } = blogData;
+        // checking for mandatory fields
+        if (!title) return res.status(400).send({ status: false, message: "title is mandatory" });
+        if (!body) return res.status(400).send({ status: false, message: "blog body is mandatory" });
+        if (typeof body !== "string") return res.status(400).send({ status: false, message: "blog body should be string" });
+        if (!authorId) return res.status(400).send({ status: false, message: "authorId is mandatory" });
+        if (!category) return res.status(400).send({ status: false, message: "blog category is mandatory" });
+        // validating the mandatory fields
+        if (!isValid(title)) return res.status(400).send({ status: false, message: "title is in valid" })
+        if (!isValid(category)) return res.status(400).send({ status: false, message: "category is in valid" });
+        if (!validString(category)) return res.status(400).send({ status: false, message: "category is not a valid string" });
+        //check for valid tags
+        if (blogData.tags) {
+            for (let i = 0; i < blogData.tags.length; i++) {
+                if (!isValid(blogData.tags[i])) {
+                    return res.status(400).send({ status: false, message: "tag is in valid" });
+                }
+            } 
+        }
+        // check for valid subcategory
+        if (blogData.subcategory) {
+            for (let i = 0; i < blogData.subcategory.length; i++) {
+                if (!isValid(blogData.subcategory[i])) {
+                    return res.status(400).send({ status: false, message: "subcategory is in valid" });
+                }
+            }
+        }
+        //checking if authorId is a valid ObjectId or not
+        let id = mongoose.Types.ObjectId.isValid(authorId)
+        if (!id) return res.status(400).send({ status: false, message: "authorId is not a valid ObjectId" });
+        let author = await authorModel.findById(authorId);
+        if (!author) return res.status(404).send({ status: false, message: "No Author Found With This ID" });
+        // saving the new blog document in the blog collection
+        let newBlog = await blogModel.create(req.body);
+        res.status(201).send({ status: true, data: newBlog });
+    }
+    catch (err) {
+        res.status(500).send({ status: false, message: "Invalid request. Please check your request parameters." });
+    }
+}
 
 
 const getAllBlogs = async(req,res)=>{
@@ -10,33 +59,16 @@ const getAllBlogs = async(req,res)=>{
         const blogs = await blogModel.find()
 
 
-        res.status(200).json({success : true, blogs : blogs})
+        res.status(200).json({status : true, blogs : blogs})
     } catch (error) {
-        console.log(errpr)
-        res.status(500).json({success: false, error: error})
-    }
-}
-
-
-const createBlog = async function (req, res) {
-    try {
-        let authorId = req.body.authorId;
-        // console.log(authorId)
-        let author = await authorModel.findById(authorId);
-
-       if (!author) return res.status(404).send({ status: false, message : "No Author Found With This ID" });
-
-        let newBlog = await blogModel.create(req.body);
-        res.status(201).send({ status: true, data: newBlog });
-    }
-    catch (err) {
-        res.status(500).send({ status : false, message: "Invalid request. Please check your request parameters."});
+        console.log(error)
+        res.status(500).json({status: false, error: error})
     }
 }
 
 
 
-
+// need to check
 const getBlog = async function (req, res) {
     try {
       const filters = req.query;
@@ -47,6 +79,8 @@ const getBlog = async function (req, res) {
   
       // Apply filters
       if (filters.authorId) {
+        let id = mongoose.Types.ObjectId.isValid(filters.authorId)
+        if (!id) return res.status(400).send({ status: false, message: "authorId is not a valid ObjectId" });
         query.authorId = filters.authorId;
       }
 
@@ -70,7 +104,6 @@ const getBlog = async function (req, res) {
         query.subcategory = { $in: filters.subcategory };
       }
   
-      console.log(query)
       const blogs = await blogModel.find(query);
   
       if (blogs.length === 0) {
@@ -89,8 +122,8 @@ const getBlog = async function (req, res) {
 const updateBlog = async function (req, res) {
     try {
       const {blogId} = req.params;
-      console.log(req.params)
-      const { title, body, tags, subcategory, isPublished } = req.body;
+      
+      const { title, body, tags, subcategory } = req.body;
   
       const blog = await blogModel.findOneAndUpdate(
         { _id: blogId, isDeleted: false },
@@ -99,7 +132,6 @@ const updateBlog = async function (req, res) {
         { new: true }
       );
   
-      console.log(isPublished)
       if (!blog) {
         return res.status(404).json({ status: false, message: "Blog not found" });
       }
@@ -110,15 +142,14 @@ const updateBlog = async function (req, res) {
         await blog.save();
       }
   
-      res.status(200).json({ status: true, message: "Blog updated successfully", data: blog });
+      res.status(200).json({ status: true, message: "Blog updated statusfully", data: blog });
     } catch (err) {
       console.log(err);
       res.status(500).json({ status: false, message: "Internal server error" });
     }
   };
   
-
-
+  
 
 
 
@@ -135,7 +166,7 @@ const deleteBlogById = async function (req, res) {
 
         if (blog == null) {
             return res.status(404).send({
-                msg: 'no such blog exists'
+                message: 'no such blog exists'
             });
         }
 
@@ -157,41 +188,56 @@ const deleteBlogById = async function (req, res) {
             data: "deletion succesfull"
         })
     } catch (err) {
+        console.log(err)
         return res.status(500).send({
             status: false,
-            msg: err.message
+            message: err.message
         })
     }
 
 }
 
 
-//  delete blog by querying
+
 const deleteByQuerying = async function (req, res) {
     try {
         const data = req.query
+        const iD = req.iD
 
         const {
             category,
             authorId,
-            tagName,
+            tags,
             subcategory,
             isPublished
         } = req.query
+        
+
         //check if the query field is empty
         if (Object.keys(data).length == 0) return res.status(400).send({
             status: false,
-            msg: "Enter the details of blog that you would like to delete"
+            message: "Enter the details of blog that you would like to delete"
         })
+
+        if (authorId) {
+            if(!mongoose.Types.ObjectId.isValid(authorId))
+            return res.status(400).send({
+                status: false,
+                message: "authorId is not a valid ObjectId"
+            });
+        }
+
 
         //finding document using query params
         const ToBeDeleted = await blogModel.findOneAndUpdate({
+            isDeleted: false,
+            authorId: iD,
             $or: [{
                 category: category
             }, {
                 authorId: authorId
             }, {
-                tags: tagName
+                tags: tags
             }, {
                 subcategory: subcategory
             }, {
@@ -202,24 +248,27 @@ const deleteByQuerying = async function (req, res) {
                 isDeleted: true,
                 deletedAt: new Date()
             }
-        })
+        },
+        {new  : true})
 
         if (ToBeDeleted == null) return res.status(404).send({
             status: false,
-            msg: "Blog not found"
+            message: "Blog not found or it was already deleted"
         })
 
         res.status(200).send({
             status: true,
-            msg: "deletion successfull"
+            message: "deletion statusfull",
         })
     } catch (err) {
+        console.log(err)
         return res.status(500).send({
             status: false,
-            msg: err.message
+            message: err.message
         })
     }
 }
+
 
 
 module.exports.deleteBlogById = deleteBlogById;
@@ -228,5 +277,4 @@ module.exports.createBlog = createBlog;
 module.exports.getBlog = getBlog;
 module.exports.getAllBlogs = getAllBlogs;
 module.exports.updateBlog = updateBlog;
-
 

@@ -2,29 +2,29 @@ const express = require('express')
 const router = express.Router()
 const { login,createAuthor,getAuthor } = require('../controllers/authorController.js')
 const { deleteBlogById,deleteByQuerying,createBlog,getBlog,getAllBlogs,updateBlog } = require('../controllers/blogController.js')
-const { isLoggedIn } = require('../middlewares/index.js')
+const { isLoggedIn , authorization } = require('../middlewares/authMiddleware.js')
 
+
+
+
+// author routes
+router.post("/authors", createAuthor)
+
+router.get("/authors", getAuthor)
+
+router.post('/login', login) // login author
 
 
 //blog routes
-router.post('/createBlog',isLoggedIn, createBlog)
-router.get('/getBlog' , getBlog);
-router.get('/blogs' , getAllBlogs);
-router.put('/blogs/:blogId' ,isLoggedIn, updateBlog);
+router.post('/blogs',isLoggedIn, createBlog)
 
+router.get('/blogs' ,isLoggedIn, getBlog);
 
+router.put('/blogs/:blogId',isLoggedIn,authorization, updateBlog);
 
+router.delete('/blogs/:blogId',isLoggedIn,authorization,deleteBlogById)
 
-// login author
-router.post('/login', login)
-
-// author routes
-router.get("/authors", getAuthor)
-router.post("/authors", createAuthor)
-
-
-router.delete('/blogs?queryParams',isLoggedIn,deleteByQuerying)
-router.delete('/blogs/:blogId',isLoggedIn,deleteBlogById)
+router.delete('/blogs',isLoggedIn,deleteByQuerying)
 
 
 

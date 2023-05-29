@@ -9,12 +9,10 @@ const blogSchema = new Schema({
         type: String,
         required: true
     },
-
     body : {
         type: String,
         required: true
     },
-
     authorId : {
         type : Schema.Types.ObjectId,
         ref : 'Author',
@@ -24,9 +22,9 @@ const blogSchema = new Schema({
     category : {type : String, required: true},
     subcategory : [{type : String}],
 
-    deletedAt: { type: Date },
+    deletedAt: { type: Date , default : ""},
     isDeleted: { type: Boolean, default: false },
-    publishedAt: { type: Date },
+    publishedAt: { type: Date , default : "" },
     isPublished: { type: Boolean, default: false }
 
 },{ timestamps: true })
