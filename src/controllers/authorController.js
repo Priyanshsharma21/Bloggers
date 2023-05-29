@@ -92,7 +92,7 @@ const login = async(req,res)=>{
         if(!email || !password ) return res.status(400).json({message : "Please enter email and password"})
 
         console.log(email)
-        const author = await authorModel.findOne({email : email})//.select('+password')
+        const author = await authorModel.findOne({email : email})
         if(!author) return res.status(400).json({success : false, message : 'You are not registered'})
         console.log(author.password)
 

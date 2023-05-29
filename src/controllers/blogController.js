@@ -4,13 +4,13 @@ const authorModel = require('../models/authorModel.js')
 var mongoose = require('mongoose');
 // var isValid = mongoose.Types.ObjectId.isValid();
 
-function isValid (data) {
-    if(typeof data !== "string" || data.trim().length == "") return false
+function isValid(data) {
+    if (typeof data !== "string" || data.trim().length == "") return false
     else return true
 }
 
-function validString(input){
-    
+function validString(input) {
+
     return (/^[a-zA-Z]+$/.test(input))
 }
 
@@ -69,15 +69,15 @@ const createBlog = async function (req, res) {
 }
 
 
-const getAllBlogs = async(req,res)=>{
+const getAllBlogs = async (req, res) => {
     try {
         const blogs = await blogModel.find()
 
 
-        res.status(200).json({success : true, blogs : blogs})
+        res.status(200).json({ success: true, blogs: blogs })
     } catch (error) {
         console.log(errpr)
-        res.status(500).json({success: false, error: error})
+        res.status(500).json({ success: false, error: error })
     }
 }
 
@@ -87,85 +87,85 @@ const getAllBlogs = async(req,res)=>{
 // need to check
 const getBlog = async function (req, res) {
     try {
-      const filters = req.query;
-      const query = {
-        isDeleted: false,
-        isPublished: true
-      };
-  
-      // Apply filters
-      if (filters.authorId) {
-        let id = mongoose.Types.ObjectId.isValid(filters.authorId)
-        if (!id) return res.status(400).send({ status: false, msg: "authorId is not a valid ObjectId" });
-        query.authorId = filters.authorId;
-      }
+        const filters = req.query;
+        const query = {
+            isDeleted: false,
+            isPublished: true
+        };
 
-      if(filters.title){
-        query.title = filters.title;
-      }
+        // Apply filters
+        if (filters.authorId) {
+            let id = mongoose.Types.ObjectId.isValid(filters.authorId)
+            if (!id) return res.status(400).send({ status: false, msg: "authorId is not a valid ObjectId" });
+            query.authorId = filters.authorId;
+        }
 
-      if(filters.body){
-        query.body = filters.body;
-      }
-  
-      if (filters.category) {
-        query.category = filters.category;
-      }
-  
-      if (filters.tags) {
-        query.tags = { $in: filters.tags };
-      }
-  
-      if (filters.subcategory) {
-        query.subcategory = { $in: filters.subcategory };
-      }
-  
-      console.log(query)
-      const blogs = await blogModel.find(query);
-  
-      if (blogs.length === 0) {
-        return res.status(404).json({ status: false, message: "No blogs found" });
-      }
-  
-      res.status(200).json({ status: true, message: "Blogs list", data: blogs });
+        if (filters.title) {
+            query.title = filters.title;
+        }
+
+        if (filters.body) {
+            query.body = filters.body;
+        }
+
+        if (filters.category) {
+            query.category = filters.category;
+        }
+
+        if (filters.tags) {
+            query.tags = { $in: filters.tags };
+        }
+
+        if (filters.subcategory) {
+            query.subcategory = { $in: filters.subcategory };
+        }
+
+        console.log(query)
+        const blogs = await blogModel.find(query);
+
+        if (blogs.length === 0) {
+            return res.status(404).json({ status: false, message: "No blogs found" });
+        }
+
+        res.status(200).json({ status: true, message: "Blogs list", data: blogs });
     } catch (err) {
-      console.log(err);
-      res.status(500).json({ status: false, message: "Internal server error" });
+        console.log(err);
+        res.status(500).json({ status: false, message: "Internal server error" });
     }
 };
-  
+
 
 
 const updateBlog = async function (req, res) {
     try {
-      const {blogId} = req.params;
-      
-      const { title, body, tags, subcategory, isPublished } = req.body;
-  
-      const blog = await blogModel.findOneAndUpdate(
-        { _id: blogId, isDeleted: false },
-        // addToSet  - check if the item already exist or not, if not then push it to array
-        { $set: { title, body }, $addToSet: { tags, subcategory } },
-        { new: true }
-      );
-  
-      if (!blog) {
-        return res.status(404).json({ status: false, message: "Blog not found" });
-      }
-  
-      if (blog.isPublished===false) {
-        blog.isPublished = true;
-        blog.publishedAt = new Date();
-        await blog.save();
-      }
-  
-      res.status(200).json({ status: true, message: "Blog updated successfully", data: blog });
+        const { blogId } = req.params;
+
+        const { title, body, tags, subcategory, isPublished } = req.body;
+
+        const blog = await blogModel.findOneAndUpdate(
+            { _id: blogId, isDeleted: false },
+            // addToSet  - check if the item already exist or not, if not then push it to array
+            { $set: { title, body }, $addToSet: { tags, subcategory } },
+            { new: true }
+        );
+
+        if (!blog) {
+            return res.status(404).json({ status: false, message: "Blog not found" });
+        }
+
+        if (blog.isPublished === false) {
+            blog.isPublished = true;
+            blog.publishedAt = new Date();
+            await blog.save();
+        }
+
+        res.status(200).json({ status: true, message: "Blog updated successfully", data: blog });
     } catch (err) {
-      console.log(err);
-      res.status(500).json({ status: false, message: "Internal server error" , err : err });
+        console.log(err);
+        res.status(500).json({ status: false, message: "Internal server error", err: err });
     }
-  };
-  
+};
+
 
 
 
@@ -175,12 +175,14 @@ const updateBlog = async function (req, res) {
 const deleteBlogById = async function (req, res) {
 
     try {
-        let {blogId} = req.params;
+        let { blogId } = req.params;
 
         let blog = await blogModel.findOne({
             _id: blogId,
             isDeleted: false
         })
+        let id = mongoose.Types.ObjectId.isValid(authorId)
+        if (!id) return res.status(400).send({ status: false, msg: "Author is not a registered!!" });
 
         if (blog == null) {
             return res.status(404).send({
@@ -190,9 +192,9 @@ const deleteBlogById = async function (req, res) {
 
         let deleteUser = await blogModel.findOneAndUpdate(
             {
-            _id: blogId,
-            isDeleted: false
-        }, {
+                _id: blogId,
+                isDeleted: false
+            }, {
             $set: {
                 isDeleted: true,
                 deletedAt: new Date()
@@ -227,7 +229,7 @@ const deleteByQuerying = async function (req, res) {
             subcategory,
             isPublished
         } = req.query
-        
+
 
 
         //check if the query field is empty
@@ -236,6 +238,8 @@ const deleteByQuerying = async function (req, res) {
             msg: "Enter the details of blog that you would like to delete"
         })
 
+        let id = mongoose.Types.ObjectId.isValid(authorId)
+        if (!id) return res.status(400).send({ status: false, msg: "Author is not a registered!!" });
         //finding document using query params
         const ToBeDeleted = await blogModel.findOneAndUpdate({
             isDeleted: false,
@@ -256,7 +260,7 @@ const deleteByQuerying = async function (req, res) {
                 deletedAt: new Date()
             }
         },
-        {new  : true})
+            { new: true })
 
         if (ToBeDeleted == null) return res.status(404).send({
             status: false,
@@ -266,7 +270,7 @@ const deleteByQuerying = async function (req, res) {
         res.status(200).send({
             status: true,
             msg: "deletion successfull",
-            data : ToBeDeleted
+            data: ToBeDeleted
         })
     } catch (err) {
         return res.status(500).send({

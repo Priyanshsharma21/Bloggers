@@ -10,7 +10,7 @@ const { isLoggedIn , authorization} = require('../middlewares/index.js')
 // author routes
 router.post("/authors", createAuthor)
 
-router.get("/authors", getAuthor)
+router.get("/authors",isLoggedIn, getAuthor)
 
 router.post('/login', login) // login author
 
@@ -18,13 +18,13 @@ router.post('/login', login) // login author
 //blog routes
 router.post('/blogs', createBlog)
 
-router.get('/blogs' , getBlog);
+router.get('/blogs' ,isLoggedIn, getBlog);
 
 router.put('/blogs/:blogId', updateBlog);
 
-router.delete('/blogs/:blogId',deleteBlogById)
+router.delete('/blogs/:blogId',isLoggedIn,deleteBlogById)
 
-router.delete('/blogs',deleteByQuerying)
+router.delete('/blogs',isLoggedIn,deleteByQuerying)
 
 
 
